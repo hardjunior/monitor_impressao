@@ -54,7 +54,7 @@ python monitor_impressao.py send <email_destino>
 
 ## Estrutura do projeto
 
-```plaintext```
+```plaintext´´´
 monitor_impressao/
 ├── falhabefore/          # PDFs que falharam na impressão
 ├── falhaafter/           # PDFs com falha pós-impressão
@@ -63,6 +63,6 @@ monitor_impressao/
 ├── requirements.txt      # Dependências Python
 ├── setup.py              # Instalação local como pacote
 └── README.md             # Documentação
-```/plaintext```
+```/plaintext´´´
 
 As pastas `falhabefore` e `falhaafter` ajudam a organizar arquivos que apresentaram problemas no processo.
