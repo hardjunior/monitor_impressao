@@ -63,6 +63,6 @@ monitor_impressao/
 ├── requirements.txt      # Dependências Python
 ├── setup.py              # Instalação local como pacote
 └── README.md             # Documentação
-```/plaintext´´´
+```plaintext´´´
 
 As pastas `falhabefore` e `falhaafter` ajudam a organizar arquivos que apresentaram problemas no processo.
