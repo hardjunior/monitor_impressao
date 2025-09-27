@@ -1,68 +1,112 @@
-# Monitor de Impressão Automática de PDFs
+# Monitor de Impressão Automático
 
-Este projeto monitora uma pasta local (onde o script é executado) para detectar novos arquivos PDF. Ao encontrar um arquivo, ele automaticamente o envia para a impressora padrão. Após a impressão, dependendo do comando recebido, o arquivo pode ser apagado, movido para uma pasta específica ou enviado por email. O sistema também lida com falhas, organizando os arquivos problemáticos em pastas dedicadas para análise posterior.
+Este projeto é um script Python para monitorar uma pasta, imprimir automaticamente arquivos PDF usando o Adobe Acrobat Reader e realizar uma ação após a impressão (apagar, mover ou enviar por email).
 
-## Técnicas usadas
+---
 
-- Monitoramento do sistema de arquivos em tempo real com [Watchdog](https://python-watchdog.readthedocs.io/en/latest/).
-- Impressão via chamadas nativas:
-  - Windows: [`os.startfile()`](https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shellexecutea) para imprimir diretamente.
-  - Linux/macOS: comando [`lp`](https://man7.org/linux/man-pages/man1/lp.1.html).
-- Configuração flexível e segura via arquivo [configparser](https://docs.python.org/3/library/configparser.html).
-- Envio de email com anexos usando [`smtplib`](https://docs.python.org/3/library/smtplib.html) e [`email.message.EmailMessage`](https://docs.python.org/3/library/email.message.html).
-- Organização de arquivos com [`shutil`](https://docs.python.org/3/library/shutil.html), permitindo mover arquivos para diretórios específicos em caso de erro.
-- Tratamento simples e direto de argumentos pela biblioteca padrão `sys.argv`.
+## Funcionalidades
 
-## Bibliotecas e tecnologias principais
+- Monitoramento em tempo real da pasta onde o script está rodando.
+- Impressão automática dos PDFs detectados via Adobe Acrobat Reader (Windows) ou lp (Linux).
+- Opções para após impressão:
+  - Apagar o arquivo PDF.
+  - Mover para uma pasta destino.
+  - Enviar por email para um destinatário configurado.
+- Configuração de caminho customizado do Adobe Acrobat Reader via parâmetro `-d`.
+- Log básico via terminal.
+- Organização de arquivos com falha em pastas específicas.
 
-- **[Watchdog](https://pypi.org/project/watchdog/)**: monitoramento cross-platform do sistema de arquivos.
-- SMTP nativo para envio de emails — evita dependência em terceiros.
-- Configuração via `.ini` — prática e leve, ideal para manter credenciais fora do código.
-- Compatibilidade multi-OS com adaptações específicas para cada sistema.
+---
 
-## Instalação rápida
+## Como usar
 
-```bash```
-# Clone o repositório
-git clone <url_do_repositorio>
+1. Clone ou copie os arquivos para a pasta desejada.
 
-# Instale as dependências
-pip install -r requirements.txt
-```/bash```
+2. Crie um arquivo chamado `config.ini` para configuração do email (se for usar o envio por email):
 
-## Configuração
+```ini
+[EMAIL]
+from = seuemail@exemplo.com
+password = sua_senha_de_app_ou_senha_real
+smtp_server = smtp.exemplo.com
+smtp_port = 587
+```
 
-Edite o arquivo `config.ini` com as credenciais do servidor SMTP e email de origem. Recomenda-se usar senhas de aplicação.
+3. Execute o script com uma das opções:
 
-Crie as pastas `falhabefore` e `falhaafter` na raiz do projeto para organizar os arquivos que apresentarem falhas.
-
-## Comandos de execução
-
-```bash```
-# Imprimir PDFs e manter os arquivos
-python monitor_impressao.py
-
-# Imprimir e apagar arquivos após impressão
+```bash
 python monitor_impressao.py delete
+python monitor_impressao.py save C:\caminho\para\pasta_destino
+python monitor_impressao.py send destinatario@exemplo.com
+python monitor_impressao.py send destinatario@exemplo.com -d "C:\Program Files\Adobe\Acrobat DC\Acrobat\Acrobat.exe"
+```
 
-# Imprimir e mover para pasta especificada
-python monitor_impressao.py save <caminho_da_pasta>
+- O parâmetro `-d` é opcional e indica o caminho para o executável do Adobe Reader caso não esteja no local padrão.
 
-# Imprimir e enviar por email
-python monitor_impressao.py send <email_destino>
-```/bash```
+---
 
-## Estrutura do projeto
+## Como funciona
 
-```plaintext´´´
-monitor_impressao/
-├── falhabefore/          # PDFs que falharam na impressão
-├── falhaafter/           # PDFs com falha pós-impressão
-├── config.ini            # Configurações de email SMTP
-├── monitor_impressao.py  # Script principal
-├── requirements.txt      # Dependências Python
-├── setup.py              # Instalação local como pacote
-└── README.md             # Documentação
-```plaintext´´´
+- O script monitora a pasta onde está rodando.
+- Ao detectar um PDF novo, ele envia para a impressora via Adobe Reader.
+- Após a impressão, realiza a ação escolhida (`delete`, `save` ou `send`).
+- Em caso de erro, o arquivo é movido para uma pasta de falhas.
 
-As pastas `falhabefore` e `falhaafter` ajudam a organizar arquivos que apresentaram problemas no processo.
+---
+
+## Dependências
+
+- Python 3.x
+- watchdog (`pip install watchdog`)
+
+---
+
+## Estrutura de pastas
+
+- monitor_impressao.py  # Script principal
+- config.ini            # Configuração do email
+- falhabefore/          # PDFs que falharam antes da impressão
+- falhaafter/           # PDFs que falharam após impressão
+
+---
+
+## Exemplo de comando
+
+```bash
+python monitor_impressao.py send seuemail@exemplo.com -d "C:\Program Files\Adobe\Acrobat DC\Acrobat\Acrobat.exe"
+```
+
+---
+## Observações
+
+- Certifique-se de que o Adobe Acrobat Reader esteja instalado e acessível no caminho especificado.
+- O script foi testado em ambientes Windows e Linux, mas pode precisar de ajustes dependendo da configuração do sistema.
+- Mantenha o arquivo `config.ini` seguro, especialmente se contiver senhas.
+
+---
+## Converter para .exe (Windows)
+
+Para converter o script Python em um executável (.exe) no Windows, você pode usar o `pyinstaller`. Siga os passos abaixo:
+
+1. Instale o `pyinstaller`:
+
+```bash
+pip install pyinstaller
+```
+
+2. Navegue até a pasta onde está o script `monitor_impressao.py`.
+
+3. Execute o seguinte comando:
+
+```bash
+pyinstaller --onefile --windowed monitor_impressao.py
+```
+
+4. Após a conclusão, você encontrará o executável na pasta `dist`.
+- Para debugar, remova o `--windowed` do comando acima.
+
+---
+
+## Contato
+
+Para dúvidas ou sugestões, entre em contato.
